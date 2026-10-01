@@ -25,21 +25,21 @@
  * ------------------------------------------------------------------------ */
 #define HISTORY_FILE "conversion_history.log"
 
-#define BOX_INNER 76    /* characters between the two vertical borders   */
-#define LABEL_W   16    /* width of the label column inside a result row */
-#define VALUE_W   56    /* width of the value column inside a result row */
-#define SHOW_LAST 15    /* history rows shown on screen                  */
+#define BOX_INNER 76 /* characters between the two vertical borders   */
+#define LABEL_W 16   /* width of the label column inside a result row */
+#define VALUE_W 56   /* width of the value column inside a result row */
+#define SHOW_LAST 15 /* history rows shown on screen                  */
 
 /* Return codes of parse_number() */
-#define PARSE_OK        0
-#define PARSE_EMPTY     1
+#define PARSE_OK 0
+#define PARSE_EMPTY 1
 #define PARSE_BAD_DIGIT 2
-#define PARSE_TOO_BIG   3
+#define PARSE_TOO_BIG 3
 
 /* The 12 pairs offered in Quick Conversion */
 #define QUICK_COUNT 12
-int quick_from[QUICK_COUNT] = { 2, 2, 2, 8, 8, 8, 10, 10, 10, 16, 16, 16 };
-int quick_to[QUICK_COUNT]   = { 8, 10, 16, 2, 10, 16, 2, 8, 16, 2, 8, 10 };
+int quick_from[QUICK_COUNT] = {2, 2, 2, 8, 8, 8, 10, 10, 10, 16, 16, 16};
+int quick_to[QUICK_COUNT] = {8, 10, 16, 2, 10, 16, 2, 8, 16, 2, 8, 10};
 
 /* ---------------------------------------------------------------------------
  *  Function prototypes
@@ -63,26 +63,34 @@ void clear_screen(void)
 /* Value of one digit character: '7' -> 7, 'f' -> 15, anything else -> -1 */
 int digit_value(char c)
 {
-    if (c >= '0' && c <= '9') return c - '0';
-    if (c >= 'a' && c <= 'z') return c - 'a' + 10;
-    if (c >= 'A' && c <= 'Z') return c - 'A' + 10;
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    if (c >= 'a' && c <= 'z')
+        return c - 'a' + 10;
+    if (c >= 'A' && c <= 'Z')
+        return c - 'A' + 10;
     return -1;
 }
 
 /* Digit character for a value: 11 -> 'B' */
 char digit_char(int value)
 {
-    if (value < 10) return (char)('0' + value);
+    if (value < 10)
+        return (char)('0' + value);
     return (char)('A' + value - 10);
 }
 
 /* Name used in menus. */
 const char *base_word(int base)
 {
-    if (base == 2)  return "Binary";
-    if (base == 8)  return "Octal";
-    if (base == 10) return "Decimal";
-    if (base == 16) return "Hexadecimal";
+    if (base == 2)
+        return "Binary";
+    if (base == 8)
+        return "Octal";
+    if (base == 10)
+        return "Decimal";
+    if (base == 16)
+        return "Hexadecimal";
     return "Custom";
 }
 
@@ -98,7 +106,8 @@ void base_label(int base, char *out)
 /* 1 if the text contains only spaces/tabs (or nothing). */
 int is_blank(const char *s)
 {
-    while (*s == ' ' || *s == '\t') s++;
+    while (*s == ' ' || *s == '\t')
+        s++;
     return *s == '\0';
 }
 
@@ -115,19 +124,26 @@ void read_line(const char *prompt, char *buf, int size)
     printf("  %s\n  > ", prompt);
     fflush(stdout);
 
-    if (fgets(buf, size, stdin) == NULL) {
+    if (fgets(buf, size, stdin) == NULL)
+    {
         printf("\n");
         show_goodbye();
         exit(0);
     }
 
     len = (int)strlen(buf);
-    if (len > 0 && buf[len - 1] == '\n') {
+    if (len > 0 && buf[len - 1] == '\n')
+    {
         buf[--len] = '\0';
-    } else {
-        while ((c = getchar()) != '\n' && c != EOF) { }   /* drop the rest */
     }
-    if (len > 0 && buf[len - 1] == '\r') buf[len - 1] = '\0';
+    else
+    {
+        while ((c = getchar()) != '\n' && c != EOF)
+        {
+        } /* drop the rest */
+    }
+    if (len > 0 && buf[len - 1] == '\r')
+        buf[len - 1] = '\0';
 }
 
 /* Keeps asking until the user types a whole number between min and max. */
@@ -136,10 +152,12 @@ int read_int_in_range(const char *prompt, int min, int max)
     char line[64], *end;
     long v;
 
-    for (;;) {
+    for (;;)
+    {
         read_line(prompt, line, sizeof line);
         v = strtol(line, &end, 10);
-        while (*end == ' ' || *end == '\t') end++;
+        while (*end == ' ' || *end == '\t')
+            end++;
         if (end != line && *end == '\0' && v >= min && v <= max)
             return (int)v;
         printf("\n  [!] Please enter a number between %d and %d.\n\n", min, max);
@@ -186,36 +204,51 @@ int parse_number(const char *text, int base, int *neg,
     *value = 0;
     *bad = '\0';
 
-    while (isspace((unsigned char)*text)) text++;
+    while (isspace((unsigned char)*text))
+        text++;
 
-    if (*text == '-')      { *neg = 1; text++; }
-    else if (*text == '+') { text++; }
+    if (*text == '-')
+    {
+        *neg = 1;
+        text++;
+    }
+    else if (*text == '+')
+    {
+        text++;
+    }
 
-    if (text[0] == '0') {
+    if (text[0] == '0')
+    {
         p = (char)tolower((unsigned char)text[1]);
         if ((base == 16 && p == 'x') || (base == 8 && p == 'o') ||
             (base == 2 && p == 'b'))
             text += 2;
     }
 
-    for (i = 0; text[i] != '\0'; i++) {
+    for (i = 0; text[i] != '\0'; i++)
+    {
         c = text[i];
-        if (c == ' ' || c == '\t' || c == '_' || c == ',') continue;
+        if (c == ' ' || c == '\t' || c == '_' || c == ',')
+            continue;
 
         d = digit_value(c);
-        if (d < 0 || d >= base) {
+        if (d < 0 || d >= base)
+        {
             *bad = c;
             return PARSE_BAD_DIGIT;
         }
-        if (v > (ULLONG_MAX - d) / base) return PARSE_TOO_BIG;   /* overflow check */
+        if (v > (ULLONG_MAX - d) / base)
+            return PARSE_TOO_BIG; /* overflow check */
         v = v * base + d;
         seen = 1;
     }
 
-    if (!seen) return PARSE_EMPTY;
+    if (!seen)
+        return PARSE_EMPTY;
 
     *value = v;
-    if (v == 0) *neg = 0;           /* "-0" is just 0 */
+    if (v == 0)
+        *neg = 0; /* "-0" is just 0 */
     return PARSE_OK;
 }
 
@@ -225,14 +258,18 @@ void to_base(unsigned long long v, int neg, int base, char *out)
     char tmp[72];
     int n = 0, i = 0;
 
-    if (v == 0) tmp[n++] = '0';
-    while (v > 0) {
+    if (v == 0)
+        tmp[n++] = '0';
+    while (v > 0)
+    {
         tmp[n++] = digit_char((int)(v % base));
         v /= base;
     }
 
-    if (neg) out[i++] = '-';
-    while (n > 0) out[i++] = tmp[--n];     /* digits were produced backwards */
+    if (neg)
+        out[i++] = '-';
+    while (n > 0)
+        out[i++] = tmp[--n]; /* digits were produced backwards */
     out[i] = '\0';
 }
 
@@ -240,7 +277,11 @@ void to_base(unsigned long long v, int neg, int base, char *out)
 int bit_count(unsigned long long v)
 {
     int bits = 0;
-    do { bits++; v /= 2; } while (v > 0);
+    do
+    {
+        bits++;
+        v /= 2;
+    } while (v > 0);
     return bits;
 }
 
@@ -252,7 +293,8 @@ void print_line(void)
 {
     int i;
     printf("+");
-    for (i = 0; i < BOX_INNER; i++) putchar('-');
+    for (i = 0; i < BOX_INNER; i++)
+        putchar('-');
     printf("+\n");
 }
 
@@ -280,20 +322,25 @@ void print_row(const char *label, const char *value)
 {
     int len = (int)strlen(value), pos = 0, first = 1, take, k;
 
-    do {
+    do
+    {
         take = len - pos;
-        if (take > VALUE_W) {
+        if (take > VALUE_W)
+        {
             take = VALUE_W;
             k = VALUE_W;
-            while (k > 0 && value[pos + k] != ' ') k--;
-            if (k > 0) take = k;
+            while (k > 0 && value[pos + k] != ' ')
+                k--;
+            if (k > 0)
+                take = k;
         }
 
         printf("| %-*s%s%-*.*s |\n", LABEL_W, first ? label : "",
                first ? ": " : "  ", VALUE_W, take, value + pos);
 
         pos += take;
-        while (value[pos] == ' ') pos++;
+        while (value[pos] == ' ')
+            pos++;
         first = 0;
     } while (pos < len);
 }
@@ -304,15 +351,27 @@ void group_digits(const char *num, int base, char *out)
     int size = 0, pos = 0, i, len;
     char sep = ' ';
 
-    if (*num == '-') { out[pos++] = '-'; num++; }
+    if (*num == '-')
+    {
+        out[pos++] = '-';
+        num++;
+    }
 
-    if (base == 2 || base == 16)  size = 4;
-    else if (base == 8)           size = 3;
-    else if (base == 10)        { size = 3; sep = ','; }
+    if (base == 2 || base == 16)
+        size = 4;
+    else if (base == 8)
+        size = 3;
+    else if (base == 10)
+    {
+        size = 3;
+        sep = ',';
+    }
 
     len = (int)strlen(num);
-    for (i = 0; i < len; i++) {
-        if (size > 0 && i > 0 && (len - i) % size == 0) out[pos++] = sep;
+    for (i = 0; i < len; i++)
+    {
+        if (size > 0 && i > 0 && (len - i) % size == 0)
+            out[pos++] = sep;
         out[pos++] = num[i];
     }
     out[pos] = '\0';
@@ -367,13 +426,13 @@ void show_main_menu(void)
     print_line();
     print_center("MAIN MENU");
     print_line();
-    print_menu_item("[1]", "Quick Conversion",     "Pick from 12 common base pairs");
-    print_menu_item("[2]", "Custom Conversion",    "Any base from 2 to 36");
+    print_menu_item("[1]", "Quick Conversion", "Pick from 12 common base pairs");
+    print_menu_item("[2]", "Custom Conversion", "Any base from 2 to 36");
     print_menu_item("[3]", "Convert to All Bases", "Bin / Oct / Dec / Hex at once");
-    print_menu_item("[4]", "View History",         "Recent conversions from the log");
-    print_menu_item("[5]", "Clear History",        "Erase the log file");
-    print_menu_item("[6]", "Help & About",         "Supported formats and limits");
-    print_menu_item("[0]", "Exit",                 "Close the program");
+    print_menu_item("[4]", "View History", "Recent conversions from the log");
+    print_menu_item("[5]", "Clear History", "Erase the log file");
+    print_menu_item("[6]", "Help & About", "Supported formats and limits");
+    print_menu_item("[0]", "Exit", "Close the program");
     print_line();
     printf("\n");
 }
@@ -387,7 +446,8 @@ void show_quick_menu(void)
     print_line();
     print_center("QUICK CONVERSION");
     print_line();
-    for (i = 0; i < QUICK_COUNT; i++) {
+    for (i = 0; i < QUICK_COUNT; i++)
+    {
         sprintf(key, "[%d]", i + 1);
         sprintf(title, "%s -> %s", base_word(quick_from[i]), base_word(quick_to[i]));
         print_menu_item(key, title, "");
@@ -419,7 +479,8 @@ void print_section(const char *title)
     int i, len = (int)strlen(title);
 
     printf("\n  %s\n  ", title);
-    for (i = 0; i < len; i++) putchar('-');
+    for (i = 0; i < len; i++)
+        putchar('-');
     printf("\n\n");
 }
 
@@ -457,10 +518,12 @@ void show_result_card(const char *input, int from, int to, const char *result,
     print_line();
     print_row("Input", gin);
     print_row("Result", gout);
-    if (strcmp(gout, result) != 0) print_row("Result (plain)", result);
+    if (strcmp(gout, result) != 0)
+        print_row("Result (plain)", result);
     print_row("Magnitude bits", bits);
     print_line();
-    if (neg) {
+    if (neg)
+    {
         print_text("Note: negative values use sign-magnitude notation.");
         print_line();
     }
@@ -469,8 +532,8 @@ void show_result_card(const char *input, int from, int to, const char *result,
 
 void show_all_bases_card(const char *input, int from, unsigned long long value, int neg)
 {
-    int targets[4] = { 2, 8, 10, 16 };
-    const char *labels[4] = { "Binary (2)", "Octal (8)", "Decimal (10)", "Hex (16)" };
+    int targets[4] = {2, 8, 10, 16};
+    const char *labels[4] = {"Binary (2)", "Octal (8)", "Decimal (10)", "Hex (16)"};
     char src[40], gin[200], out[100], gout[200], bits[32];
     int i;
 
@@ -486,7 +549,8 @@ void show_all_bases_card(const char *input, int from, unsigned long long value, 
     print_row("Input", gin);
     print_row("Magnitude bits", bits);
     print_line();
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++)
+    {
         to_base(value, neg, targets[i], out);
         group_digits(out, targets[i], gout);
         print_row(labels[i], gout);
@@ -510,14 +574,16 @@ void show_steps(unsigned long long value, int base)
 
     printf("\n  Step-by-step working (repeated division by %d)\n\n", base);
 
-    if (value == 0) {
+    if (value == 0)
+    {
         printf("  0 is written as 0 in every base.\n\n");
         return;
     }
 
-    while (value > 0 && n < 64) {
-        dividend[n]  = value;
-        quotient[n]  = value / base;
+    while (value > 0 && n < 64)
+    {
+        dividend[n] = value;
+        quotient[n] = value / base;
         remainder[n] = (int)(value % base);
         value = quotient[n];
         n++;
@@ -526,12 +592,13 @@ void show_steps(unsigned long long value, int base)
     print_steps_border();
     printf("  | %-4s | %-26s | %-20s | %-10s |\n", "Step", "Division", "Quotient", "Remainder");
     print_steps_border();
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < n; i++)
+    {
         sprintf(division, "%llu / %d", dividend[i], base);
         sprintf(rem_txt, "%d (%c)", remainder[i], digit_char(remainder[i]));
         printf("  | %-4d | %-26s | %-20llu | %-10s |\n",
                i + 1, division, quotient[i], rem_txt);
-        digits[n - 1 - i] = digit_char(remainder[i]);   /* last remainder = first digit */
+        digits[n - 1 - i] = digit_char(remainder[i]); /* last remainder = first digit */
     }
     digits[n] = '\0';
     print_steps_border();
@@ -554,7 +621,8 @@ void save_history(const char *input, int from, int to, const char *result)
     strftime(stamp, sizeof stamp, "%Y-%m-%d %H:%M:%S", t);
 
     fp = fopen(HISTORY_FILE, "a");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
         printf("  [!] Could not write to %s\n", HISTORY_FILE);
         return;
     }
@@ -567,9 +635,12 @@ void shorten(const char *s, int width, char *out)
 {
     int len = (int)strlen(s);
 
-    if (len <= width) {
+    if (len <= width)
+    {
         strcpy(out, s);
-    } else {
+    }
+    else
+    {
         strncpy(out, s, width - 2);
         out[width - 2] = '.';
         out[width - 1] = '.';
@@ -590,13 +661,16 @@ void view_history(void)
 
     print_section("Conversion History");
 
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
         printf("  [i] No history yet. Run a conversion and it will appear here.\n\n");
         return;
     }
 
-    while (fgets(line, sizeof line, fp) != NULL) total++;
-    if (total == 0) {
+    while (fgets(line, sizeof line, fp) != NULL)
+        total++;
+    if (total == 0)
+    {
         fclose(fp);
         printf("  [i] No history yet. Run a conversion and it will appear here.\n\n");
         return;
@@ -610,9 +684,11 @@ void view_history(void)
            "#", "Date & Time", "Input", "From", "To", "Result");
     print_history_border();
 
-    while (fgets(line, sizeof line, fp) != NULL) {
+    while (fgets(line, sizeof line, fp) != NULL)
+    {
         index++;
-        if (index <= skip) continue;
+        if (index <= skip)
+            continue;
         if (sscanf(line, "%19[^|]|%80[^|]|%d|%d|%80[^\n]",
                    stamp, in, &from, &to, res) != 5)
             continue;
@@ -637,7 +713,8 @@ int clear_history(void)
 
     remove(HISTORY_FILE);
     fp = fopen(HISTORY_FILE, "r");
-    if (fp != NULL) {
+    if (fp != NULL)
+    {
         fclose(fp);
         return 0;
     }
@@ -655,18 +732,23 @@ int get_number(int from, char *normalized, unsigned long long *value, int *neg)
     char input[128], prompt[80], bad;
     int status;
 
-    if (from <= 10) printf("  [i] Valid digits for base %d: 0-%d\n", from, from - 1);
-    else            printf("  [i] Valid digits for base %d: 0-9 and A-%c\n", from, digit_char(from - 1));
+    if (from <= 10)
+        printf("  [i] Valid digits for base %d: 0-%d\n", from, from - 1);
+    else
+        printf("  [i] Valid digits for base %d: 0-9 and A-%c\n", from, digit_char(from - 1));
     printf("  [i] Leave blank to go back.\n\n");
     sprintf(prompt, "Enter the %s number", base_word(from));
 
-    for (;;) {
+    for (;;)
+    {
         read_line(prompt, input, sizeof input);
-        if (is_blank(input)) return 0;
+        if (is_blank(input))
+            return 0;
 
         status = parse_number(input, from, neg, value, &bad);
-        if (status == PARSE_OK) {
-            to_base(*value, *neg, from, normalized);   /* cleaned-up version of the input */
+        if (status == PARSE_OK)
+        {
+            to_base(*value, *neg, from, normalized); /* cleaned-up version of the input */
             return 1;
         }
         show_parse_error(status, bad, from);
@@ -685,13 +767,16 @@ void convert_session(int from, int to)
     sprintf(title, "Convert %s to %s", from_txt, to_txt);
     print_section(title);
 
-    while (get_number(from, normalized, &value, &neg)) {
+    while (get_number(from, normalized, &value, &neg))
+    {
         to_base(value, neg, to, result);
         show_result_card(normalized, from, to, result, value, neg);
         save_history(normalized, from, to, result);
 
-        if (ask_yes_no("Show step-by-step working?")) show_steps(value, to);
-        if (!ask_yes_no("Convert another number with the same bases?")) return;
+        if (ask_yes_no("Show step-by-step working?"))
+            show_steps(value, to);
+        if (!ask_yes_no("Convert another number with the same bases?"))
+            return;
         printf("\n");
     }
 }
@@ -704,7 +789,8 @@ void quick_conversion(void)
     show_banner();
     show_quick_menu();
     choice = read_int_in_range("Select a conversion", 0, QUICK_COUNT);
-    if (choice == 0) return;
+    if (choice == 0)
+        return;
     convert_session(quick_from[choice - 1], quick_to[choice - 1]);
 }
 
@@ -716,7 +802,7 @@ void custom_conversion(void)
     show_banner();
     print_section("Custom Conversion");
     from = read_int_in_range("Source base (2-36)", 2, 36);
-    to   = read_int_in_range("Target base (2-36)", 2, 36);
+    to = read_int_in_range("Target base (2-36)", 2, 36);
     if (from == to)
         printf("  [i] Source and target are the same base; the number will not change.\n");
     convert_session(from, to);
@@ -724,7 +810,7 @@ void custom_conversion(void)
 
 void all_bases_conversion(void)
 {
-    int targets[4] = { 2, 8, 10, 16 };
+    int targets[4] = {2, 8, 10, 16};
     char normalized[100], result[100];
     unsigned long long value;
     int from, neg, i;
@@ -735,11 +821,14 @@ void all_bases_conversion(void)
     from = read_int_in_range("Source base (2-36)", 2, 36);
     printf("\n");
 
-    if (!get_number(from, normalized, &value, &neg)) return;
+    if (!get_number(from, normalized, &value, &neg))
+        return;
 
     show_all_bases_card(normalized, from, value, neg);
-    for (i = 0; i < 4; i++) {
-        if (targets[i] == from) continue;
+    for (i = 0; i < 4; i++)
+    {
+        if (targets[i] == from)
+            continue;
         to_base(value, neg, targets[i], result);
         save_history(normalized, from, targets[i], result);
     }
@@ -756,13 +845,15 @@ int main(void)
 
     show_welcome();
 
-    for (;;) {
+    for (;;)
+    {
         clear_screen();
         show_banner();
         show_main_menu();
         choice = read_int_in_range("Select an option [0-6]", 0, 6);
 
-        switch (choice) {
+        switch (choice)
+        {
         case 1:
             quick_conversion();
             break;
@@ -779,9 +870,12 @@ int main(void)
             pause_screen();
             break;
         case 5:
-            if (ask_yes_no("Erase all saved history?")) {
-                if (clear_history()) printf("\n  [OK] History cleared.\n\n");
-                else                 printf("\n  [!] Could not delete the history file.\n\n");
+            if (ask_yes_no("Erase all saved history?"))
+            {
+                if (clear_history())
+                    printf("\n  [OK] History cleared.\n\n");
+                else
+                    printf("\n  [!] Could not delete the history file.\n\n");
             }
             pause_screen();
             break;
