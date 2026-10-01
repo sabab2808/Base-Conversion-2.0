@@ -1,0 +1,7 @@
+# Build output
+base_converter
+base_converter.exe
+*.o
+
+# Runtime data
+conversion_history.log
